@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>GenetiComics</title>
+    <style>
+        /* Set font family for several elements */
+        body,
+        h1#heading,
+        button.button,
+        label[for="text-input"] {
+            font-family: "Comic Sans MS";
+        }
+
+        /* Set styles for body element */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgb(100, 100, 100);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Center heading text */
+        h1#heading {
+            text-align: center;
+        }
+
+        /* Style social icons container */
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Set width and height for social icon images */
+        .social-icons img {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Style buttons */
+        .button {
+            color: rgb(200, 200, 200);
+            transition: 1.3s;
+            cursor: default;
+            background-color: rgb(50, 50, 50);
+            padding: 14px 16px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        /* Set active and hover styles for buttons */
+        .button.active,
+        .button:hover {
+            color: rgb(50, 50, 50);
+            background-color: rgb(200, 200, 200);
+        }
+
+        /* Style #master element */
+        #master {
+            display: block;
+            border: 1px solid black;
+            background-color: rgb(50, 50, 50);
+            outline: rgb(50, 50, 50) groove 10px;
+            border-radius: 0;
+            margin: 0 5px;
+        }
+
+        /* Style chat scene */
+        .scene {
+            padding: 10px;
+            margin: 20px 5px 10px;
+            width: calc(100vw - 50px);
+            height: calc(100vh - 300px);
+            border: 1px solid black;
+            outline: rgb(50, 50, 50) groove 10px;
+            background-color: rgb(100, 100, 100);
+            display: none;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgb(50, 50, 50) rgb(100, 100, 100);
+        }
+
+        /* Set styles for chat scene scrollbar */
+        .scene::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scene::-webkit-scrollbar-track {
+            background: rgb(100, 100, 100);
+        }
+
+        .scene::-webkit-scrollbar-thumb {
+            background-color: rgb(50, 50, 50);
+            border-radius: 20px;
+        }
+
+        /* Set styles for send and receive chat messages */
+        .send,
+        .receive {
+            display: inline-block;
+            word-wrap: break-word;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding: 10px 5px;
+            white-space: normal;
+            caret-color: transparent;
+            cursor: default;
+            resize: both;
+            max-width: 50%;
+        }
+
+        .send .message-content,
+        .receive .message-content {
+            border: 1px solid black;
+        }
+
+        /* Set styles for sent chat messages */
+        .send {
+            border-radius: 10px 10px 10px 0;
+            background-color: rgb(200, 200, 200);
+            outline: rgb(50, 50, 50) ridge 10px;
+            margin-left: 50px;
+            color: black;
+            margin-right: auto;
+        }
+
+        /* Set styles for received chat messages */
+        .receive {
+            border-radius: 10px 10px 0 10px;
+            background-color: rgb(50, 50, 50);
+            outline: rgb(200, 200, 200) ridge 10px;
+            margin-right: 50px;
+            color: white;
+            margin-left: auto;
+        }
+
+        /* Set message content style */
+        .message-content {
+            max-width: 50%;
+            word-break: break-word;
+        }
+
+        /* Set styles for chat input field */
+        .text-input {
+            display: none;
+        }
+
+        /* Set styles for active chat input field */
+        .text-input.active {
+            display: inline-block;
+        }
+
+        /* Set styles for chat input field label */
+        label[for="text-input"] {
+            font-weight: bold;
+        }
+
+        /* Set styles for two text input areas */
+        textarea#text-input1,
+        textarea#text-input2 {
+            height: 50px;
+            width: calc(100vw - 100px);
+            /*margin-top: 5px;
+            margin-left: 10px;*/
+            outline: rgb(50, 50, 50) ridge 10px;
+            overflow-wrap: break-word;
+            border-radius: 10px 10px 10px 0;
+            background-color: rgb(200, 200, 200);
+            font-size: 16px;
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background-color: rgba(50, 50, 50, 0.9);
+            /* Optional: Add a background color */
+            padding: 10px;
+            /* Optional: Add some padding */
+            box-sizing: border-box;
+        }
+
+        /* Set textarea box-sizing */
+        textarea {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page heading -->
+    <h1 id="heading">GenetiComics</h1>
+
+    <!-- Social icons -->
+    <div class="social-icons">
+        <a href="https://www.twitter.com/GenetiComics" target="_blank">
+            <img src="C:\Users\combp\Downloads\Twitter\twitter-logo-01282021\Twitter_logo\PNG\2021_Twitter_logo_blue.png"
+                alt="Twitter" />
+        </a>
+    </div>
+
+    <!-- Master container with buttons to toggle between chat scenes -->
+    <div id="master" class="master">
+        <button id="btn1" class="button active" onclick="openTab(event,'scene1')">Messages</button>
+        <button id="btn2" class="button" onclick="openTab(event,'scene2')">Receive</button>
+    </div>
+
+    <!-- Chat scene containers -->
+    <div id="scene1" class="scene" style="display:block;"></div>
+    <div id="scene2" class="scene"></div>
+
+    <!-- Container for sender's username input -->
+    <div id="username-container1">
+        <label for="username-input1">Sender's Username: </label>
+        <input type="text" id="username-input1">
+        <button id="username-submit1">Set Username</button>
+    </div>
+
+    <!-- Container for receiver's username input -->
+    <div id="username-container2">
+        <label for="username-input2">Receiver's Username: </label>
+        <input type="text" id="username-input2">
+        <button id="username-submit2">Set Username</button>
+    </div>
+
+    <!-- Container for sender's chat input -->
+    <div id="input-container1" class="input-container" style="display:block;">
+        <textarea id="text-input1" class="text-input active" name="text-input" rows="4"></textarea>
+        <button id="send-message1" class="send-message button">Send Message</button>
+    </div>
+
+    <!-- Container for receiver's chat input -->
+    <div id="input-container2" class="input-container" style="display:none;">
+        <textarea id="text-input2" class="text-input" name="text-input" rows="4"></textarea>
+        <button id="send-message2" class="send-message button">Send Message</button>
+    </div>
+    <!-- Load the socket.io library -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- Initialize the socket connection -->
+    <script>
+        const socket = io();
+
+        // Listen for incoming messages
+        socket.on('message', (data) => {
+            // Update the height of the scenes
+            updateSceneHeight('scene1');
+            updateSceneHeight('scene2');
+
+            // Create a new message element and add it to the message list
+            const messageElement = document.createElement('li');
+            messageElement.innerText = `${data.sender}: ${data.message}`;
+            document.getElementById('messages').appendChild(messageElement);
+        });
+
+        // Function to switch between the different tabs
+        function openTab(evt, sceneName) {
+            // Hide all the scenes except the one that was clicked on
+            var i, content_, buttons;
+            content_ = document.getElementsByClassName("scene");
+            for (i = 0; i < content_.length; i++) {
+                content_[i].style.display = "none";
+            }
+
+            // Remove the active class from all the buttons
+            buttons = document.getElementsByClassName("button");
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].className = buttons[i].className.replace(" active", "");
+            }
+
+            // Show the input container for the active scene
+            const activeInputContainerId = sceneName === "scene1" ? "input-container1" : "input-container2";
+            document.getElementById(activeInputContainerId).style.display = "block";
+
+            // Hide the input container for the inactive scene
+            const inactiveSceneName = sceneName === "scene1" ? "scene2" : "scene1";
+            const inactiveInputContainerId = inactiveSceneName === "scene1" ? "input-container1" : "input-container2";
+            document.getElementById(inactiveInputContainerId).style.display = "none";
+
+            // Add the active class to the text area for the active scene
+            const activeTextAreaId = sceneName === "scene1" ? "text-input1" : "text-input2";
+            document.getElementById(activeTextAreaId).classList.add("active");
+
+            // Remove the active class from the text area for the inactive scene
+            const inactiveTextAreaId = inactiveSceneName === "scene1" ? "text-input1" : "text-input2";
+            document.getElementById(inactiveTextAreaId).classList.remove("active");
+
+            // Show the active scene
+            document.getElementById(sceneName).style.display = "block";
+
+            // Add the active class to the button that was clicked on
+            evt.currentTarget.className += " active";
+
+            // Update the height of the active scene
+            updateSceneHeight(sceneName);
+        }
+
+        // Function to send a message
+        const sendMessageButtons = document.querySelectorAll('.send-message');
+        sendMessageButtons.forEach((sendMessageButton) => {
+            sendMessageButton.addEventListener('click', function () {
+                const activeScene = document.querySelector('.button.active').id;
+                const textarea = activeScene === 'btn1' ? document.getElementById('text-input1') : document.getElementById('text-input2');
+                const targetScene = activeScene === 'btn1' ? 'scene1' : 'scene2';
+                const otherScene = targetScene === 'scene1' ? 'scene2' : 'scene1';
+                sendMessage(textarea, targetScene, otherScene, activeScene === 'btn1' ? window.senderUsername : window.receiverUsername, activeScene === 'btn1' ? window.receiverUsername : window.senderUsername);
+                textarea.value = '';
+            });
+        });
+
+        // Listen for keyboard input in the text areas
+        const textareas = document.querySelectorAll('.text-input');
+        textareas.forEach((textarea) => {
+            textarea.addEventListener('keydown', function (event) {
+                // If the Enter key is pressed without the shift key, send the message
+                if (event.which === 13 && !event.shiftKey) {
+                    event.preventDefault();
+                    const activeScene = document.querySelector('.button.active').id;
+                    const targetScene = activeScene === 'btn1' ? 'scene1' : 'scene2';
+                    const otherScene = targetScene === 'scene1' ? 'scene2' : 'scene1';
+                    sendMessage(textarea, targetScene, otherScene, activeScene === 'btn1' ? window.senderUsername : window.receiverUsername, activeScene === 'btn1' ? window.receiverUsername : window.senderUsername);
+                    textarea.value = '';
+                }
+            });
+        });
+
+        // Function to send a message
+        function sendMessage(textarea, targetScene, otherScene, username, otheruser) {
+            // Get the message text from the textarea
+            const text = textarea.value;
+            if (!text) {
+                return;
+            }
+
+            // Create a new message element for the sender and add it to the active scene
+            const sendMsgWithTimestamp = createMessageWithTimestamp('send', text, username);
+            const sendMsgContainer = document.createElement('div');
+            sendMsgContainer.style.display = 'flex';
+            sendMsgContainer.style.justifyContent = 'flex-end';
+            sendMsgContainer.style.marginBottom = '10px';
+            sendMsgContainer.appendChild(sendMsgWithTimestamp);
+            document.getElementById(targetScene).appendChild(sendMsgContainer);
+
+            // Create a new message element for the receiver and add it to the inactive scene
+            appendMessageToOtherScene(otherScene, text, username);
+
+            // Update the height of both scenes
+            updateSceneHeight(targetScene);
+            updateSceneHeight(otherScene);
+
+            // Clear the textarea
+            textarea.value = '';
+
+            // Emit a 'message' event with the text
+            socket.emit('message', { message: text });
+        }
+
+        // Function to append a message to the inactive scene
+        function appendMessageToOtherScene(sceneId, message, username) {
+            const receiveMsgWithTimestamp = createMessageWithTimestamp('receive', message, username);
+            const receiveMsgContainer = document.createElement('div');
+            receiveMsgContainer.style.display = 'flex';
+            receiveMsgContainer.style.justifyContent = 'flex-start';
+            receiveMsgContainer.style.marginBottom = '10px';
+            receiveMsgContainer.appendChild(receiveMsgWithTimestamp);
+            document.getElementById(sceneId).appendChild(receiveMsgContainer);
+        }
+
+        // Function to adjust the height of the scenes
+        function adjustSceneHeight() {
+            const scenes = document.querySelectorAll('.scene');
+            scenes.forEach((scene) => {
+                scene.style.height = `calc(100vh - 250px)`;
+            });
+        }
+
+        // Listen for window resize events and adjust the height of the scenes accordingly
+        window.addEventListener('resize', adjustSceneHeight);
+        adjustSceneHeight();
+
+        // Function to update the height of a single scene
+        function updateSceneHeight(sceneId) {
+            const scene = document.getElementById(sceneId);
+            const children = scene.children;
+            const totalHeight = [...children].reduce((acc, child) => {
+                return acc + child.offsetHeight + parseInt(window.getComputedStyle(child).marginBottom);
+            }, 0);
+            scene.style.height = totalHeight + "px";
+        }
+
+        // This code prevents the user from typing uppercase letters in message textareas.
+
+        // Select all elements with class "send" and add event listener for 'keydown' on each.
+        const thistxt1 = document.getElementsByClassName("send");
+        for (let i = 0; i < thistxt1.length; i++) {
+            thistxt1[i].addEventListener('keydown', function (event) {
+                // If key code is for uppercase letter (between 65 and 90 inclusive), prevent default behavior.
+                if (event.keyCode >= 65 && event.keyCode <= 90) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        // Select all elements with class "receive" and add event listener for 'keydown' on each.
+        const thistxt2 = document.getElementsByClassName("receive");
+        for (let i = 0; i < thistxt2.length; i++) {
+            thistxt2[i].addEventListener('keydown', function (event) {
+                // If key code is for uppercase letter (between 65 and 90 inclusive), prevent default behavior.
+                if (event.keyCode >= 65 && event.keyCode <= 90) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        // Add event listener for the click event on the submit button for sender's username.
+        document.getElementById('username-submit1').addEventListener('click', () => {
+            // Get the value of the input field for sender's username.
+            const username = document.getElementById('username-input1').value;
+            // If a username has been entered, store it as a property of the window object and hide the container for entering the username.
+            if (username) {
+                window.senderUsername = username;
+                document.getElementById('username-container1').style.display = 'none';
+            }
+        });
+
+        // Add event listener for the click event on the submit button for receiver's username.
+        document.getElementById('username-submit2').addEventListener('click', () => {
+            // Get the value of the input field for receiver's username.
+            const username = document.getElementById('username-input2').value;
+            // If a username has been entered, store it as a property of the window object and hide the container for entering the username.
+            if (username) {
+                window.receiverUsername = username;
+                document.getElementById('username-container2').style.display = 'none';
+            }
+        });
+        // This function formats the current time as a string in the format "HH:MM:SS".
+        function formatTimestamp() {
+            const now = new Date(); // Create a new Date object representing the current date and time.
+            // Map the hours, minutes, and seconds of the current time to strings, padding each with a leading zero if necessary, and join them with colons.
+            return [now.getHours(), now.getMinutes(), now.getSeconds()]
+                .map(n => String(n).padStart(2, '0'))
+                .join(':');
+        }
+
+        // This function creates a message element with a timestamp and message content, and applies appropriate styling based on the type of message (sent or received).
+        function createMessageWithTimestamp(type, message, user) {
+            const msgWithTimestamp = document.createElement('div'); // Create a new div element to contain the message and timestamp.
+            const msgContent = document.createElement('div'); // Create a new div element to contain the message content.
+            msgContent.innerText = message; // Set the text content of the message content div to the message text.
+            // Apply styles to the message content div.
+            Object.assign(msgContent.style, {
+                padding: '10px',
+                borderRadius: '5px',
+                fontSize: '14px',
+                maxWidth: '60%',
+                wordWrap: 'break-word',
+                border: '1px solid black',
+                background: type === 'send' ? '#e8e8e8' : '#d1d1d1', // Set the background color based on whether the message is being sent or received.
+                borderTopRightRadius: type === 'send' ? '0px' : '', // Set the border radius of the top right corner based on whether the message is being sent or received.
+                borderTopLeftRadius: type === 'receive' ? '0px' : '', // Set the border radius of the top left corner based on whether the message is being sent or received.
+            });
+
+            // If the message type is 'receive', change the border color of the message content div to a lighter shade of black.
+            if (type === 'receive') {
+                msgContent.style.border = '1px solid #c1c1c1';
+            }
+
+            // Create a new div element to contain the timestamp and user information.
+            const timestamp = document.createElement('div');
+            // Set the text content of the timestamp div to a string containing the username and the current time formatted using the formatTimestamp function.
+            timestamp.innerText = `${user} | ${formatTimestamp()}`;
+            // Apply styles to the timestamp div.
+            Object.assign(timestamp.style, {
+                fontSize: '12px',
+                color: '#888',
+                marginBottom: '10px',
+            });
+            // Append the message content and timestamp divs to the message with timestamp div.
+            msgWithTimestamp.appendChild(msgContent);
+            msgWithTimestamp.appendChild(timestamp);
+            // Return the message with timestamp div.
+            return msgWithTimestamp;
+        }
+        // Get references to the submit button and input field for sender's username, as well as the submit button and input field for receiver's username, and the send message button and input field for each user.
+        const usernameSubmit1 = document.getElementById('username-submit1');
+        const usernameInput1 = document.getElementById('username-input1');
+        const usernameSubmit2 = document.getElementById('username-submit2');
+        const usernameInput2 = document.getElementById('username-input2');
+        const sendMessage1 = document.getElementById('send-message1');
+        const textInput1 = document.getElementById('text-input1');
+        const sendMessage2 = document.getElementById('send-message2');
+        const textInput2 = document.getElementById('text-input2');
+
+        // Add event listeners for the click events on the submit buttons for each user's username.
+        usernameSubmit1.addEventListener('click', function () {
+            // Emit a 'send' event on the socket with an object containing the sender's username.
+            socket.emit('send', { username: usernameInput1.value });
+        });
+        usernameSubmit2.addEventListener('click', function () {
+            // Emit a 'receive' event on the socket with an object containing the receiver's username.
+            socket.emit('receive', { username: usernameInput2.value });
+        });
+
+        // Add event listeners for the click events on the send message buttons for each user.
+        sendMessage1.addEventListener('click', function () {
+            const message = textInput1.value; // Get the value of the input field for the sender's message.
+            if (message) {
+                // Emit a 'send' event on the socket with an object containing the sender's message.
+                socket.emit('send', { message });
+            }
+        });
+        sendMessage2.addEventListener('click', function () {
+            const message = textInput2.value; // Get the value of the input field for the receiver's message.
+            if (message) {
+                // Emit a 'receive' event on the socket with an object containing the receiver's message.
+                socket.emit('receive', { message });
+            }
+        });
+
+    </script>
+</body>
+
+</html>
